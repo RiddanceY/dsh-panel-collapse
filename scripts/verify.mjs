@@ -5,6 +5,8 @@
 import { readFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import vm from "node:vm";
+import os from "node:os";
+import path from "node:path";
 
 const pkgDir = new URL("../", import.meta.url);
 const read = (name) => readFileSync(new URL(name, pkgDir), "utf8");
@@ -147,14 +149,16 @@ check(
 
 // ---- installed copy (optional) --------------------------------------------
 // Only meaningful on a machine that has the bundle linked into a DSH profile.
+// Matches the Windows default; on Linux/macOS this path simply does not exist and
+// the block below skips. Set DSH_PROFILE_DIR to check some other profile.
 const profileDir = process.env.DSH_PROFILE_DIR
-  ?? `${process.env.USERPROFILE}\\.dsh\\profiles\\desktop`;
-const installed = `${profileDir}\\node_modules\\${pkg.name}`;
+  ?? path.join(os.homedir(), ".dsh", "profiles", "desktop");
+const installed = path.join(profileDir, "node_modules", pkg.name);
 if (existsSync(installed)) {
   const hash = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
-  const same = hash(new URL("client.js", pkgDir)) === hash(`${installed}\\client.js`);
+  const same = hash(new URL("client.js", pkgDir)) === hash(path.join(installed, "client.js"));
   check(same, "installed client.js matches the source", same ? "live link" : "STALE COPY — reinstall needed");
-  const manifest = JSON.parse(readFileSync(`${profileDir}\\package.json`, "utf8"));
+  const manifest = JSON.parse(readFileSync(path.join(profileDir, "package.json"), "utf8"));
   check(
     JSON.stringify(manifest.dependencies?.[pkg.name] ?? "").includes("link:"),
     "profile dependency is a link",
