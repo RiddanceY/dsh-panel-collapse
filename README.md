@@ -12,10 +12,14 @@ gets more room. The state is remembered per browser profile and survives restart
 
 ## Install
 
-> **Not on npm yet.** `npm view dsh-panel-collapse` returns 404, so the registry command below
-> fails until the first `npm publish`. Use the source install for now.
+```bash
+dsh plugin --profile <your-profile> add dsh-panel-collapse
+```
 
-### From source (works today)
+Restart the app afterwards — DeepSeek Harness only loads a new client module generation on
+startup, so the button will not appear until you relaunch.
+
+### From source
 
 ```bash
 git clone https://github.com/RiddanceY/dsh-panel-collapse.git
@@ -24,15 +28,6 @@ dsh plugin --profile <your-profile> add "link:/absolute/path/to/dsh-panel-collap
 
 `link:` makes the profile point at the clone instead of copying it, so `git pull` is enough to
 update and there is nothing to reinstall.
-
-### From npm (after the first publish)
-
-```bash
-dsh plugin --profile <your-profile> add dsh-panel-collapse
-```
-
-Either way, restart the app afterwards — DeepSeek Harness only loads a new client module
-generation on startup, so the button will not appear until you relaunch.
 
 To remove it:
 
