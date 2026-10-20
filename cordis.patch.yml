@@ -1,0 +1,3 @@
+- insert:
+    - id: panel-collapse
+      name: 'dsh-panel-collapse'

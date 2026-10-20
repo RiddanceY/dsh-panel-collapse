@@ -1,0 +1,60 @@
+{
+  "name": "dsh-panel-collapse",
+  "version": "1.0.0",
+  "description": "Adds a button to the DeepSeek Harness sidebar footer that collapses or expands the global panel list.",
+  "type": "module",
+  "license": "MIT",
+  "author": "RiddanceY",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RiddanceY/dsh-panel-collapse.git"
+  },
+  "homepage": "https://github.com/RiddanceY/dsh-panel-collapse#readme",
+  "bugs": {
+    "url": "https://github.com/RiddanceY/dsh-panel-collapse/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "plugin",
+    "sidebar",
+    "ui"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "dsh": ">=0.2.0-rc.2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  }
+}
