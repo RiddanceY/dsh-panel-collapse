@@ -148,21 +148,29 @@ check(
 );
 
 // ---- installed copy (optional) --------------------------------------------
-// Only meaningful on a machine that has the bundle linked into a DSH profile.
-// Matches the Windows default; on Linux/macOS this path simply does not exist and
-// the block below skips. Set DSH_PROFILE_DIR to check some other profile.
+// Only meaningful on a machine that has this bundle installed into a DSH profile,
+// either as a `link:` dev install (node_modules entry junctioned to the source tree)
+// or as a regular install from the registry. Matches the Windows default; on
+// Linux/macOS this path simply does not exist and the block below skips.
+// Set DSH_PROFILE_DIR to check some other profile.
 const profileDir = process.env.DSH_PROFILE_DIR
   ?? path.join(os.homedir(), ".dsh", "profiles", "desktop");
 const installed = path.join(profileDir, "node_modules", pkg.name);
 if (existsSync(installed)) {
   const hash = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
-  const same = hash(new URL("client.js", pkgDir)) === hash(path.join(installed, "client.js"));
-  check(same, "installed client.js matches the source", same ? "live link" : "STALE COPY — reinstall needed");
   const manifest = JSON.parse(readFileSync(path.join(profileDir, "package.json"), "utf8"));
+  const spec = String(manifest.dependencies?.[pkg.name] ?? "");
+  const linked = spec.includes("link:");
+  const same = hash(new URL("client.js", pkgDir)) === hash(path.join(installed, "client.js"));
   check(
-    JSON.stringify(manifest.dependencies?.[pkg.name] ?? "").includes("link:"),
-    "profile dependency is a link",
-    manifest.dependencies?.[pkg.name],
+    same,
+    "installed client.js matches the source",
+    same ? (linked ? "live link" : `published copy (${spec})`) : "STALE COPY — reinstall needed",
+  );
+  check(
+    linked || /^[~^]?\d+\.\d+\.\d+/.test(spec),
+    "profile dependency is a link or a published version",
+    spec,
   );
   check(manifest.dsh?.profile?.bundles?.includes(pkg.name), "bundle is active in the profile layer stack");
 } else {
